@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#100f16">
+  <meta name="description" content="RedCasino brings Discord mini-games, a server XP economy, leaderboards, and scheduled lotteries to your community.">
+  <title>RedCasino · Discord Game Bot</title>
+  <link rel="stylesheet" href="./landing.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="header">
+    <div class="wrap nav">
+      <a class="brand" href="./" aria-label="RedCasino home">
+        <svg class="brand-mark" viewBox="0 0 36 36" aria-hidden="true">
+          <rect x="1" y="1" width="34" height="34" rx="10" fill="#2a1b31" stroke="#59406b"/>
+          <path d="M18 6.5 29.5 18 18 29.5 6.5 18Z" fill="none" stroke="#f492af" stroke-width="1.2"/>
+          <path d="M18 11c-1.9 2.1-6 4.9-6 8.1a3.6 3.6 0 0 0 6 2.7c1.9 1.8 6 .8 6-2.7 0-3.2-4.1-6-6-8.1Zm0 10v4m-2.4 0h4.8" fill="#f492af" stroke="#f492af" stroke-linecap="round"/>
+        </svg>
+        <span>Red<span class="brand-accent">Casino</span></span>
+      </a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#features">Features</a>
+        <a href="#games">Games</a>
+      </nav>
+      <a class="button secondary nav-dashboard" href="./dashboard/">Dashboard preview <span aria-hidden="true">↗</span></a>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> THE DISCORD ARCADE BOT</p>
+          <h1>Your server.<br><span>Your arcade.</span></h1>
+          <p class="lede">Spin, duel, and climb the leaderboard. RedCasino brings mini-games, a server XP economy, and scheduled lotteries to Discord.</p>
+          <div class="actions">
+            <a class="button primary" href="https://discord.com/oauth2/authorize?client_id=1569670765564137573&amp;integration_type=0&amp;scope=bot+applications.commands&amp;permissions=51200&amp;guild_id=1569672355842625588&amp;disable_guild_select=true">Add to Your Server <span aria-hidden="true">↗</span></a>
+            <a class="button secondary" href="./dashboard/">Dashboard preview <span aria-hidden="true">→</span></a>
+          </div>
+          <p class="note">Free to use · Test-server installs</p>
+        </div>
+
+        <figure class="hero-preview" aria-labelledby="preview-label">
+          <div class="preview-top">
+            <span><span class="hash" aria-hidden="true">#</span> game-night</span>
+            <span id="preview-label" class="preview-tag">GAME PREVIEW</span>
+          </div>
+          <div class="preview-body">
+            <div class="preview-message">
+              <span class="avatar" aria-hidden="true">♠</span>
+              <div>
+                <div class="command-line"><strong>RedCasino</strong> <span class="app-tag">APP</span> <code>/wheel amount:100</code></div>
+                <div class="result">
+                  <div class="result-title">🎡 Spin Wheel <span>·</span> <span class="result-win">WIN</span></div>
+                  <p><span class="mention">@Nova</span> <span>· ×3</span></p>
+                  <img src="./preview/wheel.png" width="660" height="199" alt="Spin Wheel result showing a 3× multiplier, a profit of 200 XP, and a balance of 1,274 XP">
+                  <div class="result-footer">The Arcade</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <figcaption>Example round · Actual in-Discord result style</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <div class="summary wrap" aria-label="Highlights">
+      <div><strong>13 mini-games</strong><span>Solo rounds and multiplayer duels</span></div>
+      <div><strong>Draws every 3 hours</strong><span>When a lottery schedule is enabled</span></div>
+      <div><strong>One dashboard</strong><span>Game rules, XP, and events</span></div>
+    </div>
+
+    <section class="section wrap" id="features" aria-labelledby="features-title">
+      <div class="section-heading">
+        <p class="eyebrow">BUILT FOR YOUR COMMUNITY</p>
+        <h2 id="features-title">More reasons to play together.</h2>
+        <p>Give members a reason to check in, challenge each other, and come back for the next draw.</p>
+      </div>
+      <div class="features-grid">
+        <article class="feature economy">
+          <div class="feature-copy">
+            <span class="feature-tag">01 / XP ECONOMY</span>
+            <h3>Earn it. Gift it. Rank up.</h3>
+            <p>Claim daily XP and streaks, earn membership bonuses, gift points to friends, and see how you stack up with <code>/rank</code> and <code>/leaderboard</code>.</p>
+          </div>
+          <img src="./preview/leaderboard.png" width="660" height="208" loading="lazy" alt="Example leaderboard showing Nova, Ember, and Pixel ranked by XP balance">
+        </article>
+        <article class="feature lottery">
+          <div class="feature-copy">
+            <span class="feature-tag">02 / SERVER LOTTERY</span>
+            <h3>One ticket. One winner.</h3>
+            <p>Enter free for a server XP prize. Admins can draw on demand or schedule draws every three hours in a chosen channel.</p>
+          </div>
+          <img src="./preview/lottery.png" width="660" height="154" loading="lazy" alt="Example lottery card with a 500 XP prize and free entry">
+        </article>
+        <article class="feature controls">
+          <div class="feature-copy">
+            <span class="feature-tag">03 / ADMIN DASHBOARD</span>
+            <h3>Your server sets the rules.</h3>
+            <p>Configure games, payout settings, fees, cooldowns, daily rewards, currency display, and lottery timing. Adjust balances and review the XP ledger from the dashboard.</p>
+          </div>
+          <ul class="control-list" aria-label="Dashboard areas">
+            <li><span aria-hidden="true">🎮</span> Game room <span>Limits &amp; payouts</span></li>
+            <li><span aria-hidden="true">💰</span> XP economy <span>Rewards &amp; fees</span></li>
+            <li><span aria-hidden="true">🎟️</span> Lottery <span>Channel &amp; schedule</span></li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section class="section games-section" id="games" aria-labelledby="games-title">
+      <div class="wrap">
+        <div class="section-heading">
+          <p class="eyebrow">THE GAME ROOM</p>
+          <h2 id="games-title">Pick your next round.</h2>
+          <p>Start with a slash command. Play with buttons, watch the reveal, and see the result right in Discord.</p>
+        </div>
+        <div class="games-grid">
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">🎲</span>
+      <div><h3>Dice Duel</h3><p>Two members stake the same XP. High roll wins. Ties refund both.</p>
+        <code>/dice</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">🎰</span>
+      <div><h3>Slots</h3><p>Three reels. Match all three symbols to win the configured payout.</p>
+        <code>/slot</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">🎟️</span>
+      <div><h3>Scratch Card</h3><p>Click to reveal each of the three spots. Matching all three pays 2×.</p>
+        <code>/scratch</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">🎡</span>
+      <div><h3>Spin Wheel</h3><p>Spin for a multiplier or a free re-spin. Miss loses the stake.</p>
+        <code>/wheel</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">💣</span>
+      <div><h3>Minesweeper</h3><p>Pick safe tiles on a 5×4 board. Cash out before you hit a mine.</p>
+        <code>/mines</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">🃏</span>
+      <div><h3>High–Low</h3><p>Guess the next card’s rank. Ties return your stake.</p>
+        <code>/highlow</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">♠️</span>
+      <div><h3>Blackjack</h3><p>Hit, stand, double down, or split a pair. Natural blackjack pays 2.5×.</p>
+        <code>/blackjack</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">🗼</span>
+      <div><h3>Tower</h3><p>Pick a door on each floor. Climb safely and cash out before finding a trap.</p>
+        <code>/tower</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">🏇</span>
+      <div><h3>Horse Race</h3><p>Open a shared race. Members get 10 seconds to back a horse after the host picks.</p>
+        <code>/horse</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">💣</span>
+      <div><h3>Bomb Defusal</h3><p>Guess the three unique digits. Each attempt reveals exact and misplaced matches.</p>
+        <code>/defuse</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">🎯</span>
+      <div><h3>Russian Roulette</h3><p>Two to six players take turns. Last player standing wins the XP pot.</p>
+        <code>/roulette</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">🂠</span>
+      <div><h3>Indian Poker</h3><p>See their card, hide yours. Each player can raise once and must have 3× the opening stake.</p>
+        <code>/poker</code></div>
+    </article>
+    <article class="game">
+      <span class="game-icon" aria-hidden="true">❌</span>
+      <div><h3>Tic-Tac-Toe</h3><p>Two players take turns on a 3×3 board. Three in a row wins. Draws refund both stakes.</p>
+        <code>/tictactoe</code></div>
+    </article></div>
+      </div>
+    </section>
+
+    <section class="wrap install" id="install" aria-labelledby="install-title">
+      <div>
+        <p class="eyebrow">GET STARTED</p>
+        <h2 id="install-title">Ready for game night?</h2>
+        <p>Add RedCasino, then run <code>/daily</code> to claim your first XP.</p>
+        <p class="install-note">Installation currently targets the RedCasino test server.</p>
+      </div>
+      <div class="actions">
+        <a class="button primary" href="https://discord.com/oauth2/authorize?client_id=1569670765564137573&amp;integration_type=0&amp;scope=bot+applications.commands&amp;permissions=51200&amp;guild_id=1569672355842625588&amp;disable_guild_select=true">Add to Your Server <span aria-hidden="true">↗</span></a>
+        <a class="button secondary" href="./dashboard/">Dashboard preview <span aria-hidden="true">→</span></a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer-inner">
+      <a class="brand" href="./">Red<span class="brand-accent">Casino</span></a>
+      <p>Discord mini-games with server XP. No real-money wagers or payouts.</p>
+      <a href="./dashboard/">Dashboard preview <span aria-hidden="true">↗</span></a>
+    </div>
+  </footer>
+</body>
+</html>
