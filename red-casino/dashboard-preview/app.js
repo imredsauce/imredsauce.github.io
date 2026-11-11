@@ -214,6 +214,13 @@ function gamesPage() {
   const value = overview.value;
   return `${heading('🎮 GAME SETTINGS', 'Game room', 'Choose games, allowed channels, and betting limits for your server.')}
     <form data-form="games">
+      <section class="panel leaderboard-settings">${section('🏆', 'Live leaderboard', 'One read-only post, refreshed every 5 minutes. Run /casinosetupchannels to create its channel.')}
+        <div class="fields"><label>Leaderboard channel<select name="leaderboardChannel"><option value="">Disabled</option>
+          ${value.leaderboardChannel && !(overview.leaderboardChannels ?? []).some(({ id }) => id === value.leaderboardChannel)
+            ? `<option value="${escapeHtml(value.leaderboardChannel)}" selected>Current channel</option>` : ''}
+          ${(overview.leaderboardChannels ?? []).map(({ id, name }) => `<option value="${escapeHtml(id)}" ${id === value.leaderboardChannel ? 'selected' : ''}>#${escapeHtml(name)}</option>`).join('')}
+        </select></label></div>
+      </section>
       <div class="game-grid">${Object.entries(session.games).map(([id, { emoji, name, description, free, options }]) => {
         const config = value.games[id];
         const extra = {
@@ -384,6 +391,7 @@ root.addEventListener('submit', async (event) => {
         settings.lotteryTimezone = data.get('lotteryTimezone').trim();
         for (const key of ['lotteryMinutes', 'lotteryPrize']) settings[key] = num(key);
       } else {
+        settings.leaderboardChannel = data.get('leaderboardChannel');
         for (const [game, config] of Object.entries(settings.games)) {
           config.enabled = data.has(`${game}.enabled`);
           config.channels = data.getAll(`${game}.channels`);
