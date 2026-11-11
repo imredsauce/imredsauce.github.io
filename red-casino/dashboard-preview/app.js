@@ -189,9 +189,30 @@ function economyPage() {
     </form>`;
 }
 
+function channelSelection(channels) {
+  if (!channels.length) return 'All shared channels';
+  if (channels.length > 1) return `${channels.length} channels selected`;
+  const channel = overview.gameChannels?.find(({ id }) => id === channels[0]);
+  return channel ? `#${channel.name}` : 'Unavailable channel';
+}
+
+function gameChannelPicker(id, config) {
+  const selected = config.channels ?? [];
+  const available = overview.gameChannels ?? [];
+  const channels = [...available, ...selected.filter((id) => !available.some((channel) => channel.id === id))
+    .map((id) => ({ id, name: `Unavailable channel · ${id}` }))];
+  return `<fieldset class="game-channels"><legend>📍 Allowed channels</legend>
+    <details><summary><span data-channel-summary>${escapeHtml(channelSelection(selected))}</span></summary>
+      <div class="channel-options">${channels.map(({ id: channel, name }) => `<label>
+        <input type="checkbox" name="${id}.channels" value="${escapeHtml(channel)}" ${selected.includes(channel) ? 'checked' : ''}>
+        <span>#${escapeHtml(name)}</span></label>`).join('') || '<p class="muted">No available text channels.</p>'}</div>
+    </details><p class="muted">Assigned channels only allow their selected games, including in threads. Leave empty to use shared channels.</p>
+  </fieldset>`;
+}
+
 function gamesPage() {
   const value = overview.value;
-  return `${heading('🎮 GAME SETTINGS', 'Game room', 'Pick what members can play and tune each game’s limits.')}
+  return `${heading('🎮 GAME SETTINGS', 'Game room', 'Choose games, allowed channels, and betting limits for your server.')}
     <form data-form="games">
       <div class="game-grid">${Object.entries(session.games).map(([id, { emoji, name, description, free, options }]) => {
         const config = value.games[id];
@@ -210,6 +231,7 @@ function gamesPage() {
           ${input(`${id}.cooldown`, 'Cooldown · s', config.cooldown, 0, 3600)}
           </div>${id === 'wheel' ? extra[id]() : extra[id] ? `<div class="fields">${extra[id]()}</div>` : ''}
           ${options ? `<div class="fields">${options.map(([key, label, min, max]) => input(key, label, value[key], min, max)).join('')}</div>` : ''}
+          ${gameChannelPicker(id, config)}
           </section>`;
       }).join('')}</div>
       <div class="panel save-panel">${save()}</div>
@@ -295,6 +317,17 @@ document.addEventListener('click', async (event) => {
 });
 
 root.addEventListener('input', (event) => {
+  if (event.target.closest('[data-form="games"]') && event.target.name.endsWith('.channels')) {
+    const picker = event.target.closest('.game-channels');
+    let selected = Array.from(picker.querySelectorAll('input:checked'), ({ value }) => value);
+    if (selected.length > 25) {
+      event.target.checked = false;
+      selected = selected.filter((id) => id !== event.target.value);
+      announce('Choose up to 25 channels per game.', true);
+    }
+    picker.querySelector('[data-channel-summary]').textContent = channelSelection(selected);
+    return;
+  }
   const form = event.target.closest('[data-form="economy"]');
   if (!form || !event.target.name.startsWith('currency')) return;
   const data = new FormData(form);
@@ -353,6 +386,7 @@ root.addEventListener('submit', async (event) => {
       } else {
         for (const [game, config] of Object.entries(settings.games)) {
           config.enabled = data.has(`${game}.enabled`);
+          config.channels = data.getAll(`${game}.channels`);
           const { free, options } = session.games[game];
           for (const key of free ? ['cooldown'] : ['min', 'max', 'cooldown']) config[key] = num(`${game}.${key}`);
           for (const [key] of options ?? []) settings[key] = num(key);
