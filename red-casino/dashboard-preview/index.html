@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en" data-preview>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12111c">
+  <title>RedCasino · Dashboard Preview</title>
+  <link rel="stylesheet" href="./style.css">
+  <script type="module" src="./app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="../"><span class="brand-icon" aria-hidden="true">🎲</span><span>Red<span class="accent">Casino</span><small>SERVER DASHBOARD</small></span></a>
+      <label class="server"><span aria-hidden="true">🎮</span><select id="guild" aria-label="Discord server" disabled><option>Select a server</option></select></label>
+      <button class="server-list-button" type="button" id="servers">← All servers</button>
+      <div class="nav-label">WORKSPACE</div>
+      <nav aria-label="Dashboard sections">
+        <button data-tab="overview" class="selected" type="button"><span aria-hidden="true">🏠</span>Overview</button>
+        <button data-tab="economy" type="button"><span aria-hidden="true">💰</span>XP economy</button>
+        <button data-tab="games" type="button"><span aria-hidden="true">🎲</span>Game room</button>
+        <button data-tab="lottery" type="button"><span aria-hidden="true">🎟️</span>Lottery</button>
+      </nav>
+      <div class="side-footer"><span>✨</span><div><strong>For the community</strong><small>Free to use · Server XP</small></div></div>
+    </aside>
+    <main>
+      <header class="top"><span id="breadcrumb">Admin dashboard</span><div id="identity"></div></header>
+      <p class="preview-note">Explore a sample server. Changes reset when you reload.</p>
+      <div id="notice" role="status" aria-live="polite" hidden></div>
+      <div id="content"><section class="panel empty"><h1>Loading RedCasino…</h1></section></div>
+    </main>
+  </div>
+</body>
+</html>

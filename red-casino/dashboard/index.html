@@ -1,32 +1,27 @@
 <!doctype html>
-<html lang="en" data-preview>
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#12111c">
-  <title>RedCasino · Dashboard Preview</title>
+  <meta name="description" content="Sign in with Discord to manage your RedCasino server, games, rewards, and lottery events.">
+  <title>RedCasino · Admin Dashboard</title>
   <link rel="stylesheet" href="./style.css">
-  <script type="module" src="./app.js"></script>
 </head>
-<body>
+<body class="signed-out">
   <div class="shell">
-    <aside class="sidebar">
-      <a class="brand" href="../"><span class="brand-icon" aria-hidden="true">🎲</span><span>Red<span class="accent">Casino</span><small>SERVER DASHBOARD</small></span></a>
-      <label class="server"><span aria-hidden="true">🎮</span><select id="guild" aria-label="Discord server" disabled><option>Loading servers…</option></select></label>
-      <div class="nav-label">WORKSPACE</div>
-      <nav aria-label="Dashboard sections">
-        <button data-tab="overview" class="selected" type="button"><span aria-hidden="true">🏠</span>Overview</button>
-        <button data-tab="economy" type="button"><span aria-hidden="true">💰</span>XP economy</button>
-        <button data-tab="games" type="button"><span aria-hidden="true">🎲</span>Game room</button>
-        <button data-tab="lottery" type="button"><span aria-hidden="true">🎟️</span>Lottery</button>
-      </nav>
-      <div class="side-footer"><span>✨</span><div><strong>For the community</strong><small>Free to use · Server XP</small></div></div>
-    </aside>
     <main>
-      <header class="top"><span id="breadcrumb">Workspace / Overview</span><div id="identity"></div></header>
-      <p class="preview-note">Explore a sample server. Changes reset when you reload.</p>
-      <div id="notice" role="status" aria-live="polite" hidden></div>
-      <div id="content"><section class="panel empty"><h1>Loading RedCasino…</h1></section></div>
+      <header class="top"><span>Admin dashboard</span><a href="../">← Back to RedCasino</a></header>
+      <section class="auth-card">
+        <a class="brand" href="../"><span class="brand-icon" aria-hidden="true">♠</span>Red<span class="accent">Casino</span></a>
+        <p class="eyebrow">YOUR SERVER, YOUR RULES</p>
+        <h1>Your control room<br>for game night.</h1>
+        <p>Sign in with Discord to manage your server’s games, rewards, and XP economy.</p>
+        <p class="access-status">Admin sign-in is getting ready. You can explore the dashboard below while access is being connected.</p>
+        <small>For server owners and members with Manage Server permission.</small>
+        <div class="auth-features"><span>🎮 Game controls</span><span>💰 XP economy</span><span>🎟️ Lottery events</span></div>
+        <div class="access-links"><a href="../dashboard-preview/">Explore the sample dashboard →</a></div>
+      </section>
     </main>
   </div>
 </body>

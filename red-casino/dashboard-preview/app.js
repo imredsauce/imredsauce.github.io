@@ -10,6 +10,7 @@ let overview;
 let selectedGuild;
 let active = 'overview';
 let selection = 0;
+let loadingGuild = false;
 
 const escapeHtml = (value) => String(value ?? '').replaceAll(/[&<>"']/g, (char) =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
@@ -52,28 +53,67 @@ const check = (name, label, checked) =>
 const save = () => `<div class="form-footer"><span>${previewMode ? 'Changes apply to this preview session.' : 'Changes apply to new actions in this server.'}</span><button class="primary">Save changes</button></div>`;
 
 function render() {
+  document.body.classList.toggle('signed-out', !session?.user);
   for (const button of document.querySelectorAll('nav button')) {
     button.classList.toggle('selected', button.dataset.tab === active);
     if (button.dataset.tab === active) button.setAttribute('aria-current', 'page');
     else button.removeAttribute('aria-current');
     button.disabled = !overview;
   }
-  document.querySelector('#breadcrumb').textContent = `Workspace / ${titles[active]}`;
+  document.querySelector('#breadcrumb').textContent = selectedGuild ? `Workspace / ${titles[active]}` : 'Admin dashboard';
   if (!session) return;
   if (!session.user) {
-    root.innerHTML = `<section class="hero landing"><div><p class="eyebrow">✦ YOUR SERVER, YOUR RULES</p>
-      <h1>Game night starts here.</h1><p>Run your Discord XP economy, rankings, and games from one dashboard.</p>
-      <a class="primary" href="/auth/login">🔑 Sign in with Discord</a></div><div class="hero-art" aria-hidden="true">🎮</div></section>`;
+    root.innerHTML = `<section class="auth-card">
+      <a class="brand" href="/"><span class="brand-icon" aria-hidden="true">♠</span>Red<span class="accent">Casino</span></a>
+      <p class="eyebrow">YOUR SERVER, YOUR RULES</p><h1>Your control room<br>for game night.</h1>
+      <p>Sign in with Discord to manage your server’s games, rewards, and XP economy.</p>
+      <a class="primary discord-signin" href="/auth/login">🔑 Continue with Discord <span aria-hidden="true">↗</span></a>
+      <small>For server owners and members with Manage Server permission.</small>
+      <div class="auth-features"><span>🎮 Game controls</span><span>💰 XP economy</span><span>🎟️ Lottery events</span></div>
+    </section>`;
+    return;
+  }
+  if (!selectedGuild) {
+    root.innerHTML = serversPage();
     return;
   }
   if (!overview) {
-    root.innerHTML = session.guilds.length
-      ? '<section class="panel empty"><h1>Loading server…</h1></section>'
-      : `<section class="panel empty"><h1>Connect a server</h1><p>Install RedCasino in a Discord server where you have Manage Server permission.</p>
-        ${session.invite ? `<a class="primary" href="${escapeHtml(session.invite)}">Add to Discord</a>` : ''}</section>`;
+    root.innerHTML = loadingGuild
+      ? '<section class="panel empty" aria-busy="true"><p class="eyebrow">CONNECTING</p><h1>Opening your server…</h1><p>Loading its settings and XP activity.</p></section>'
+      : '<section class="panel empty"><h1>Server unavailable</h1><p>Check your Discord permissions, then refresh the server list.</p><button class="primary" type="button" data-action="refresh">Refresh servers</button></section>';
     return;
   }
   root.innerHTML = { overview: overviewPage, economy: economyPage, games: gamesPage, lottery: lotteryPage }[active]();
+}
+
+function serversPage() {
+  const connected = session.guilds.filter(({ installed }) => installed !== false).length;
+  return `${heading('✦ YOUR WORKSPACE', 'Choose your server.', 'Select a server to manage its games, rewards, and community events.')}
+    <div class="servers-toolbar"><span>${connected} connected · ${session.guilds.length} you can manage</span>
+      <button class="secondary" type="button" data-action="refresh">↻ Refresh servers</button></div>
+    <div class="servers-grid">${session.guilds.map(({ id, name, installed }) => {
+      const ready = installed !== false;
+      const invite = session.invite && new URL(session.invite);
+      if (invite) { invite.searchParams.set('guild_id', id); invite.searchParams.delete('disable_guild_select'); }
+      return `<section class="server-card"><div class="server-card-top"><span class="server-avatar" aria-hidden="true">${escapeHtml(Array.from(name)[0]?.toUpperCase())}</span>
+        <span class="connection ${ready ? 'connected' : ''}">${ready ? '● Connected' : 'Setup needed'}</span></div>
+        <h2>${escapeHtml(name)}</h2><p>${ready ? 'Your games, your rewards, your rules.' : 'Add RedCasino to open this server’s dashboard.'}</p>
+        ${ready ? `<button class="primary" type="button" data-server="${escapeHtml(id)}">Manage server <span aria-hidden="true">→</span></button>`
+          : invite ? `<a class="secondary" href="${escapeHtml(invite.href)}" target="_blank" rel="noopener noreferrer">Add to server <span aria-hidden="true">↗</span></a>` : ''}
+      </section>`;
+    }).join('')}</div>
+    ${session.guilds.length ? '' : '<section class="panel empty"><h2>Your servers will appear here.</h2><p>Sign in with a Discord account that owns a server or has Manage Server permission.</p></section>'}`;
+}
+
+function updateAccount() {
+  identity.innerHTML = session.demo ? `<span class="badge">● ${previewMode ? 'SAMPLE DATA' : 'DEMO MODE'}</span>` : session.user
+    ? `<span class="identity-name">${escapeHtml(session.user.name)}</span><button id="logout" type="button">Sign out</button>`
+    : '<a class="secondary" href="/">← Back to RedCasino</a>';
+  const connected = session.guilds.filter(({ installed }) => installed !== false);
+  guildPicker.innerHTML = '<option value="">Select a server</option>' + connected.map(({ id, name }) =>
+    `<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`).join('');
+  guildPicker.value = selectedGuild || '';
+  guildPicker.disabled = !connected.length;
 }
 
 function overviewPage() {
@@ -203,20 +243,43 @@ function lotteryPage() {
 async function loadGuild(id) {
   const current = ++selection;
   overview = null;
-  selectedGuild = id;
+  selectedGuild = id || null;
+  loadingGuild = Boolean(id);
+  active = 'overview';
+  guildPicker.value = id || '';
   render();
+  if (!id) return;
   try {
     const data = await api(`/api/guilds/${id}`);
     if (selection === current) {
       overview = data;
+      loadingGuild = false;
       render();
     }
   } catch (error) {
-    if (selection === current) announce(error.message, true);
+    if (selection === current) {
+      loadingGuild = false;
+      render();
+      announce(error.message, true);
+    }
   }
 }
 
 document.addEventListener('click', async (event) => {
+  const server = event.target.closest('[data-server]');
+  if (server) { announce(''); await loadGuild(server.dataset.server); }
+  if (event.target.closest('#servers')) { announce(''); await loadGuild(''); }
+  const refresh = event.target.closest('[data-action="refresh"]');
+  if (refresh) {
+    refresh.disabled = true;
+    try {
+      session = await api('/api/session');
+      updateAccount();
+      await loadGuild('');
+      announce('Server list refreshed.');
+    } catch (error) { announce(error.message, true); }
+    finally { refresh.disabled = false; }
+  }
   const tab = event.target.closest('[data-tab]');
   if (tab && overview) {
     active = tab.dataset.tab;
@@ -309,14 +372,8 @@ root.addEventListener('submit', async (event) => {
 
 try {
   session = await api('/api/session');
-  identity.innerHTML = session.demo ? `<span class="badge">● ${previewMode ? 'SAMPLE DATA' : 'DEMO MODE'}</span>` : session.user
-    ? `<span class="identity-name">${escapeHtml(session.user.name)}</span><button id="logout" type="button">Sign out</button>`
-    : '<a class="primary" href="/auth/login">Sign in</a>';
-  guildPicker.innerHTML = session.guilds.length ? session.guilds.map(({ id, name }) =>
-    `<option value="${escapeHtml(id)}">${escapeHtml(name)}</option>`).join('') : '<option>No connected servers</option>';
-  guildPicker.disabled = !session.guilds.length;
-  if (session.guilds.length) await loadGuild(session.guilds[0].id);
-  else render();
+  updateAccount();
+  render();
 } catch (error) {
   root.innerHTML = previewMode
     ? '<section class="panel empty"><h1>Preview unavailable</h1><a class="primary" href="./">Retry preview</a></section>'
