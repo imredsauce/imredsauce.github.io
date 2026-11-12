@@ -94,6 +94,11 @@ main { width: 100%; max-width: 1530px; padding: 0 36px 36px; margin: 0 auto; }
 .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
 .panel { padding: 19px; }
 form.panel + form.panel { margin-top: 15px; }
+.rewards-guide { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin: 15px 0; padding: 15px; border: 1px solid #57436f; border-radius: 12px; background: #31244266; }
+.rewards-guide > div { flex: 1 1 270px; }
+.rewards-guide strong { font-size: 14px; }
+.rewards-guide p { margin: 6px 0 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.primary.danger { background: #f18ba1; color: #34131c; }
 .section-title { display: flex; align-items: flex-start; gap: 11px; margin-bottom: 15px; }
 .section-title > span { display: grid; place-items: center; width: 39px; height: 39px; flex: 0 0 39px; border-radius: 11px; background: #2b223f; font-size: 19px; }
 .section-title h2 { margin: 0; font-size: 16px; }
@@ -126,6 +131,7 @@ form.panel + form.panel { margin-top: 15px; }
 .game-channels { margin: 18px 0 0; padding: 0; border: 0; min-width: 0; }
 .game-channels legend { margin-bottom: 8px; color: #e0d6f2; font-size: 12px; font-weight: 650; }
 .game-channels details { border: 1px solid #443957; border-radius: 9px; background: #15131f; overflow: hidden; }
+details.game-channels { margin-bottom: 18px; border: 1px solid #443957; border-radius: 9px; background: #15131f; overflow: hidden; }
 .game-channels summary { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 12px; cursor: pointer; color: #dbc5ff; font-size: 13px; list-style: none; }
 .game-channels summary::after { content: '⌄'; color: var(--muted); }
 .game-channels summary::-webkit-details-marker { display: none; }

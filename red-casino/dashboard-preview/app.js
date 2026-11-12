@@ -167,15 +167,57 @@ function economyPage() {
         <div class="currency-preview"><span>Preview</span><output id="currency-preview">${escapeHtml(xp(10000))}</output></div>
       </div>
       ${section('📅', 'Daily check-in', 'Members claim once per server calendar day with /daily.')}
+      <div class="rewards-guide"><div><strong>A starting pace for 5k–20k bets</strong><p>5k attendance, up to 4k streak bonus, 1k membership bonus, 100 per eligible chat message, and 500 per five voice minutes. No daily earning limits. Review the rates, then save.</p></div><button type="button" class="secondary" data-rewards-preset>Fill community preset</button></div>
       <div class="fields">
         <label>Server timezone<input name="timezone" value="${escapeHtml(value.timezone)}" placeholder="Asia/Manila" maxlength="100" required></label>
         ${input('dailyXp', 'Daily reward · XP', value.dailyXp, 0, 100000000)}
+        ${input('dailyStreakXp', 'Bonus per extra consecutive day · XP', value.dailyStreakXp, 0, 1000000)}
+        ${input('dailyStreakCap', 'Streak bonus stops growing on day', value.dailyStreakCap, 1, 30)}
         ${input('memberXp', 'Membership bonus · XP', value.memberXp, 0, 100000000)}
         ${input('memberDays', 'Membership required · days', value.memberDays, 0, 3650)}
       </div>
+      ${section('💬', 'Chat rewards', 'Earn across text channels, with one cooldown per member across the whole server. Bots, webhooks, edits, and slash commands do not earn chat rewards.')}
+      ${check('textXpEnabled', 'Enable chat rewards', value.textXpEnabled)}
+      <div class="fields">
+        ${input('textXp', 'Per eligible message · XP', value.textXp, 0, 1000000)}
+        ${input('textCooldown', 'Reward cooldown · seconds', value.textCooldown, 15, 3600)}
+        ${input('textDailyLimit', 'Optional daily chat limit · 0 = No limit', value.textDailyLimit, 0, 100000000)}
+      </div>
+      ${section('🎧', 'Voice rewards', 'Earn for eligible time in normal voice channels. AFK and stage channels never earn rewards. Offline bot time does not count.')}
+      ${check('voiceXpEnabled', 'Enable voice rewards', value.voiceXpEnabled)}
+      ${check('voiceIgnoreMuted', 'Pause rewards for muted or deafened members', value.voiceIgnoreMuted)}
+      <div class="fields">
+        ${input('voiceXp', 'Per voice interval · XP', value.voiceXp, 0, 1000000)}
+        ${input('voiceMinutes', 'Eligible minutes per reward', value.voiceMinutes, 1, 60)}
+        ${input('voiceDailyLimit', 'Optional daily voice limit · 0 = No limit', value.voiceDailyLimit, 0, 100000000)}
+        ${input('voiceMinMembers', 'Eligible humans required in the same channel', value.voiceMinMembers, 1, 10)}
+      </div>
+      ${section('📍', 'Activity exclusions', 'All visible server channels count unless excluded here. Excluding a category also excludes its channels and their threads.')}
+      <details class="game-channels"><summary>Excluded channels and categories</summary><div class="channel-options">
+        ${[...(overview.activityChannels ?? []), ...value.activityExcludedChannels.filter(id => !(overview.activityChannels ?? []).some(channel => channel.id === id)).map(id => ({ id, name: 'Unavailable channel' }))]
+          .map(channel => `<label><input type="checkbox" name="activityExcludedChannels" value="${escapeHtml(channel.id)}" ${value.activityExcludedChannels.includes(channel.id) ? 'checked' : ''}><span>${channel.type === 4 ? 'Category · ' : channel.type === 2 || channel.type === 13 ? 'Voice · ' : '#'}${escapeHtml(channel.name)}</span></label>`).join('')}
+      </div></details>
       ${section('🎁', 'Member gifts', 'The sender pays the fee on top of the gift, rounded up to the next whole XP.')}
       <div class="fields">${input('giftFee', 'Transfer fee · %', value.giftFee, 0, 100)}</div>
       ${save()}
+    </form>
+    <form class="panel" data-form="reset-schedule">
+      ${section('🔄', 'Scheduled balance resets', `Use the server timezone: ${escapeHtml(value.timezone)}. Each reset zeroes balances and closes unfinished games, including lotteries. Attendance history and today's activity totals stay intact.`)}
+      ${check('xpResetEnabled', 'Enable scheduled balance resets', value.xpResetEnabled)}
+      <div class="fields">
+        <label>Repeat<select name="xpResetCycle">${['daily', 'weekly', 'monthly'].map(cycle => `<option value="${cycle}" ${value.xpResetCycle === cycle ? 'selected' : ''}>${cycle[0].toUpperCase() + cycle.slice(1)}</option>`).join('')}</select></label>
+        ${input('xpResetHour', 'Hour · 24-hour clock', value.xpResetHour, 0, 23)}
+        ${input('xpResetMinute', 'Minute', value.xpResetMinute, 0, 59)}
+        <label>Weekday · weekly only<select name="xpResetWeekday">${['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => `<option value="${index}" ${value.xpResetWeekday === index ? 'selected' : ''}>${day}</option>`).join('')}</select></label>
+        ${input('xpResetMonthDay', 'Day of month · monthly only', value.xpResetMonthDay, 1, 28)}
+      </div>
+      <p class="muted">${session.demo ? 'Preview only. Scheduled resets do not run here.' : overview.resetStatus?.nextAt ? `Next reset: ${escapeHtml(new Date(overview.resetStatus.nextAt).toLocaleString('en-US', { timeZone: value.timezone, dateStyle: 'medium', timeStyle: 'short' }))} · ${escapeHtml(value.timezone)}` : 'Scheduled resets are off.'}</p>
+      ${save()}
+    </form>
+    <form class="panel" data-form="reset">
+      ${section('🧹', 'Reset all balances now', 'Set every member balance to zero and close unfinished games. This keeps attendance history, activity totals, and the audit ledger.')}
+      <div class="fields"><label>Type RESET to confirm<input name="confirmation" pattern="RESET" autocomplete="off" required></label></div>
+      <div class="form-footer"><span>Applies only to the selected server.</span><button class="primary danger">Reset All Balances</button></div>
     </form>
     <form class="panel" data-form="adjust">
       ${section('🛠️', 'Adjust a balance', 'Add or remove XP and record your reason in the ledger. Use /xp for a member without a profile.')}
@@ -233,8 +275,8 @@ function gamesPage() {
         return `<section class="panel game"><div class="game-top">${section(emoji, name, description)}
           ${check(`${id}.enabled`, 'Enabled', config.enabled)}</div><div class="command">/${id}</div>
           <div class="fields game-limits">
-          ${free ? '' : input(`${id}.min`, 'Min stake', config.min, 1, 100000000)}
-          ${free ? '' : input(`${id}.max`, 'Max stake', config.max, 1, 100000000)}
+          ${free ? '' : input(`${id}.min`, 'Min stake', config.min, 1, Number.MAX_SAFE_INTEGER)}
+          ${free ? '' : input(`${id}.max`, 'Max stake · 0 = No limit', config.max, 0, Number.MAX_SAFE_INTEGER)}
           ${input(`${id}.cooldown`, 'Cooldown · s', config.cooldown, 0, 3600)}
           </div>${id === 'wheel' ? extra[id]() : extra[id] ? `<div class="fields">${extra[id]()}</div>` : ''}
           ${options ? `<div class="fields">${options.map(([key, label, min, max]) => input(key, label, value[key], min, max)).join('')}</div>` : ''}
@@ -295,6 +337,16 @@ async function loadGuild(id) {
 }
 
 document.addEventListener('click', async (event) => {
+  if (event.target.closest('[data-rewards-preset]') && session.rewardsPreset) {
+    const form = root.querySelector('[data-form="economy"]');
+    for (const [name, value] of Object.entries(session.rewardsPreset)) {
+      const input = form.elements.namedItem(name);
+      if (!input) continue;
+      if (input.type === 'checkbox') input.checked = value;
+      else input.value = value;
+    }
+    announce('Community reward rates filled in. Review them, then save changes.');
+  }
   const server = event.target.closest('[data-server]');
   if (server) { announce(''); await loadGuild(server.dataset.server); }
   if (event.target.closest('#servers')) { announce(''); await loadGuild(''); }
@@ -363,7 +415,16 @@ root.addEventListener('submit', async (event) => {
   submit.disabled = true;
   announce('');
   try {
-    if (kind === 'adjust') {
+    if (kind === 'reset') {
+      form.dataset.requestId ||= crypto.randomUUID();
+      const reset = await api(`/api/guilds/${id}/reset`, 'POST', { confirmation: data.get('confirmation'), requestId: form.dataset.requestId });
+      if (selection !== current) return;
+      const refreshed = await api(`/api/guilds/${id}`);
+      if (selection !== current) return;
+      overview = refreshed;
+      render();
+      announce(`${reset.changed} balance(s) reset. ${reset.closedRounds} unfinished game(s) closed.`);
+    } else if (kind === 'adjust') {
       const payload = { user: data.get('user').trim(), delta: num('delta'), reason: data.get('reason') };
       const signature = JSON.stringify(payload);
       if (form.dataset.adjustment !== signature) {
@@ -384,12 +445,19 @@ root.addEventListener('submit', async (event) => {
         settings.currencyLabel = data.get('currencyLabel').trim();
         settings.currencyPosition = data.get('currencyPosition');
         settings.currencyDecimals = num('currencyDecimals');
-        for (const key of ['dailyXp', 'memberXp', 'memberDays', 'giftFee']) settings[key] = num(key);
+        for (const key of ['dailyXp', 'dailyStreakXp', 'dailyStreakCap', 'memberXp', 'memberDays', 'giftFee',
+          'textXp', 'textCooldown', 'textDailyLimit', 'voiceXp', 'voiceMinutes', 'voiceDailyLimit', 'voiceMinMembers']) settings[key] = num(key);
+        for (const key of ['textXpEnabled', 'voiceXpEnabled', 'voiceIgnoreMuted']) settings[key] = data.has(key);
+        settings.activityExcludedChannels = data.getAll('activityExcludedChannels');
       } else if (kind === 'lottery') {
         settings.lotteryEnabled = data.has('lotteryEnabled');
         settings.lotteryChannel = data.get('lotteryChannel');
         settings.lotteryTimezone = data.get('lotteryTimezone').trim();
         for (const key of ['lotteryMinutes', 'lotteryPrize']) settings[key] = num(key);
+      } else if (kind === 'reset-schedule') {
+        settings.xpResetEnabled = data.has('xpResetEnabled');
+        settings.xpResetCycle = data.get('xpResetCycle');
+        for (const key of ['xpResetHour', 'xpResetMinute', 'xpResetWeekday', 'xpResetMonthDay']) settings[key] = num(key);
       } else {
         settings.leaderboardChannel = data.get('leaderboardChannel');
         for (const [game, config] of Object.entries(settings.games)) {
@@ -405,6 +473,7 @@ root.addEventListener('submit', async (event) => {
       const saved = await api(`/api/guilds/${id}/settings`, 'PUT', { settings, revision: overview.revision });
       if (selection !== current) return;
       Object.assign(overview, saved);
+      if (kind === 'economy' || kind === 'reset-schedule') render();
       announce('Settings saved.');
     }
   } catch (error) {

@@ -2,6 +2,7 @@ const sample = fetch(new URL('./sample.json', import.meta.url)).then((response) 
   if (!response.ok) throw new Error('Sample server data could not load.');
   return response.json();
 });
+const resets = new Map();
 
 export async function previewRequest(path, method, body) {
   const { session, overview } = await sample;
@@ -13,6 +14,18 @@ export async function previewRequest(path, method, body) {
     overview.value = body.settings;
     overview.revision += 1;
     return structuredClone({ value: overview.value, revision: overview.revision });
+  }
+  if (method === 'POST' && path === `${guild}/reset`) {
+    if (body.confirmation !== 'RESET') throw new Error('Type RESET to confirm clearing every member balance.');
+    if (resets.has(body.requestId)) return structuredClone(resets.get(body.requestId));
+    const changed = overview.ranking.filter(member => member.balance > 0).length;
+    const result = { members: overview.stats.members, changed, closedRounds: 0, at: Date.now() };
+    overview.ranking = [];
+    overview.stats.xp = 0;
+    overview.resetStatus = { ...(overview.resetStatus ?? {}), lastAt: result.at };
+    overview.activity.unshift({ name: 'Server', delta: 0, reason: 'All sample balances reset' });
+    resets.set(body.requestId, result);
+    return structuredClone(result);
   }
 
   if (method === 'POST' && path === `${guild}/adjust`) {
